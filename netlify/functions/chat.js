@@ -112,7 +112,7 @@ TONE:
 
   try {
     const { status, body } = await anthropicPost(apiKey, {
-      model: 'claude-3-haiku-20240307',
+      model: 'claude-3-5-haiku-20241022',
       max_tokens: 400,
       system,
       messages: messages.slice(-10),
