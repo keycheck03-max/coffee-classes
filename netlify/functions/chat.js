@@ -122,10 +122,16 @@ TONE:
 
     if (status !== 200) {
       console.error('Anthropic API error:', status, body);
+      const friendlyError =
+        status === 401 ? 'API key is invalid — check it in Netlify environment variables.' :
+        status === 402 ? 'No credits on the Anthropic account — add billing at console.anthropic.com.' :
+        status === 403 ? 'API key does not have permission to use this model.' :
+        status === 429 ? 'Too many requests — wait a moment and try again.' :
+        `Anthropic returned an error (${status}). Check Netlify function logs for details.`;
       return {
         statusCode: 502,
         headers: corsHeaders(),
-        body: JSON.stringify({ error: 'Could not reach the assistant right now. Try again in a moment.' }),
+        body: JSON.stringify({ error: friendlyError }),
       };
     }
 
