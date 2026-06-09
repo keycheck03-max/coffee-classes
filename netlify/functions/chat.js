@@ -1,14 +1,49 @@
+const https = require('https');
+
+function anthropicPost(apiKey, payload) {
+  return new Promise((resolve, reject) => {
+    const body = JSON.stringify(payload);
+    const req = https.request(
+      {
+        hostname: 'api.anthropic.com',
+        path: '/v1/messages',
+        method: 'POST',
+        headers: {
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'content-type': 'application/json',
+          'content-length': Buffer.byteLength(body),
+        },
+      },
+      (res) => {
+        let data = '';
+        res.on('data', (chunk) => { data += chunk; });
+        res.on('end', () => resolve({ status: res.statusCode, body: data }));
+      }
+    );
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
 exports.handler = async function (event) {
   if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: corsHeaders(),
-      body: '',
-    };
+    return { statusCode: 200, headers: corsHeaders(), body: '' };
   }
 
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
+  }
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    console.error('ANTHROPIC_API_KEY is not set');
+    return {
+      statusCode: 500,
+      headers: corsHeaders(),
+      body: JSON.stringify({ error: 'Server configuration error — API key missing.' }),
+    };
   }
 
   let messages;
@@ -65,7 +100,7 @@ Q: Why the deposit?
 A: It holds the time just for you and keeps things professional. Remaining balance is paid on the day.
 
 Q: What's the Full Barista Programme?
-A: A complete 6-hour training across two 3-hour sessions. Session 1 covers all fundamentals. Session 2 goes deeper — bar workflow, full café drink menu, mise en place, drink sequencing, order management, and a real rush simulation. You walk out ready to work a café bar.
+A: A complete 6-hour training across two 3-hour sessions. Session 1 covers all fundamentals. Session 2 goes deeper — bar workflow, full café drink menu, mise en place, drink sequencing, order management, and a rush simulation. You walk out ready to work a café bar.
 
 TONE:
 - Warm, friendly, and direct — like Jimmy texting a potential student
@@ -76,35 +111,31 @@ TONE:
 - Never invent information not listed above`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 400,
-        system,
-        messages: messages.slice(-10),
-      }),
+    const { status, body } = await anthropicPost(apiKey, {
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 400,
+      system,
+      messages: messages.slice(-10),
     });
 
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error('Anthropic API error:', res.status, errText);
-      throw new Error('API error');
+    const data = JSON.parse(body);
+
+    if (status !== 200) {
+      console.error('Anthropic API error:', status, body);
+      return {
+        statusCode: 502,
+        headers: corsHeaders(),
+        body: JSON.stringify({ error: 'Could not reach the assistant right now. Try again in a moment.' }),
+      };
     }
 
-    const data = await res.json();
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json', ...corsHeaders() },
       body: JSON.stringify({ reply: data.content[0].text }),
     };
   } catch (err) {
-    console.error(err);
+    console.error('Function error:', err);
     return {
       statusCode: 500,
       headers: corsHeaders(),
