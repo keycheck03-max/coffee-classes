@@ -1,9 +1,0 @@
-src/
-wrangler.toml
-.assetsignore
-.git/
-.gitignore
-.DS_Store
-.claude/
-unsorted/
-*.md
