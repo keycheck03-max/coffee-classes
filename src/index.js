@@ -1,24 +1,4 @@
-export async function onRequestOptions() {
-  return new Response(null, { headers: corsHeaders() });
-}
-
-export async function onRequestPost(context) {
-  const { request, env } = context;
-
-  const apiKey = env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    return jsonResponse({ error: 'Server configuration error — API key missing.' }, 500);
-  }
-
-  let messages;
-  try {
-    ({ messages } = await request.json());
-    if (!Array.isArray(messages) || messages.length === 0) throw new Error();
-  } catch {
-    return new Response('Bad Request', { status: 400 });
-  }
-
-  const system = `You are the booking assistant for "Make Coffee With Love," a 1-on-1 barista training business in Cairns, Australia run by Jimmy.
+const SYSTEM_PROMPT = `You are the booking assistant for "Make Coffee With Love," a 1-on-1 barista training business in Cairns, Australia run by Jimmy.
 
 Your job: answer questions warmly, help people choose the right session, and guide them to book.
 
@@ -74,6 +54,38 @@ TONE:
 - For specific time slot questions, tell them to check the Calendly widget for live availability
 - Never invent information not listed above`;
 
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+
+    if (url.pathname === '/api/chat') {
+      if (request.method === 'OPTIONS') {
+        return new Response(null, { headers: corsHeaders() });
+      }
+      if (request.method === 'POST') {
+        return handleChat(request, env);
+      }
+      return new Response('Method Not Allowed', { status: 405 });
+    }
+
+    return env.ASSETS.fetch(request);
+  },
+};
+
+async function handleChat(request, env) {
+  const apiKey = env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    return jsonResponse({ error: 'Server configuration error — API key missing.' }, 500);
+  }
+
+  let messages;
+  try {
+    ({ messages } = await request.json());
+    if (!Array.isArray(messages) || messages.length === 0) throw new Error();
+  } catch {
+    return new Response('Bad Request', { status: 400 });
+  }
+
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -85,7 +97,7 @@ TONE:
       body: JSON.stringify({
         model: 'claude-3-5-haiku-20241022',
         max_tokens: 400,
-        system,
+        system: SYSTEM_PROMPT,
         messages: messages.slice(-10),
       }),
     });
@@ -96,7 +108,7 @@ TONE:
       console.error('Anthropic API error:', res.status, JSON.stringify(data));
       const detail = data.error?.message || 'unknown';
       const friendlyError =
-        res.status === 401 ? 'API key is invalid — check it in Cloudflare Pages environment variables.' :
+        res.status === 401 ? 'API key is invalid — check it in Cloudflare environment variables.' :
         res.status === 402 ? 'No credits on the Anthropic account — add billing at console.anthropic.com.' :
         res.status === 403 ? 'API key does not have permission to use this model.' :
         res.status === 429 ? 'Too many requests — wait a moment and try again.' :
