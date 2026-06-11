@@ -1,57 +1,21 @@
-const https = require('https');
-
-function anthropicPost(apiKey, payload) {
-  return new Promise((resolve, reject) => {
-    const body = JSON.stringify(payload);
-    const req = https.request(
-      {
-        hostname: 'api.anthropic.com',
-        path: '/v1/messages',
-        method: 'POST',
-        headers: {
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'content-type': 'application/json',
-          'content-length': Buffer.byteLength(body),
-        },
-      },
-      (res) => {
-        let data = '';
-        res.on('data', (chunk) => { data += chunk; });
-        res.on('end', () => resolve({ status: res.statusCode, body: data }));
-      }
-    );
-    req.on('error', reject);
-    req.write(body);
-    req.end();
-  });
+export async function onRequestOptions() {
+  return new Response(null, { headers: corsHeaders() });
 }
 
-exports.handler = async function (event) {
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers: corsHeaders(), body: '' };
-  }
+export async function onRequestPost(context) {
+  const { request, env } = context;
 
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
-  }
-
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    console.error('ANTHROPIC_API_KEY is not set');
-    return {
-      statusCode: 500,
-      headers: corsHeaders(),
-      body: JSON.stringify({ error: 'Server configuration error — API key missing.' }),
-    };
+    return jsonResponse({ error: 'Server configuration error — API key missing.' }, 500);
   }
 
   let messages;
   try {
-    ({ messages } = JSON.parse(event.body));
+    ({ messages } = await request.json());
     if (!Array.isArray(messages) || messages.length === 0) throw new Error();
   } catch {
-    return { statusCode: 400, body: 'Bad Request' };
+    return new Response('Bad Request', { status: 400 });
   }
 
   const system = `You are the booking assistant for "Make Coffee With Love," a 1-on-1 barista training business in Cairns, Australia run by Jimmy.
@@ -111,46 +75,48 @@ TONE:
 - Never invent information not listed above`;
 
   try {
-    const { status, body } = await anthropicPost(apiKey, {
-      model: 'claude-3-5-haiku-20241022',
-      max_tokens: 400,
-      system,
-      messages: messages.slice(-10),
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'claude-3-5-haiku-20241022',
+        max_tokens: 400,
+        system,
+        messages: messages.slice(-10),
+      }),
     });
 
-    const data = JSON.parse(body);
+    const data = await res.json();
 
-    if (status !== 200) {
-      console.error('Anthropic API error:', status, body);
-      let detail = '';
-      try { detail = JSON.parse(body).error?.message || ''; } catch {}
+    if (!res.ok) {
+      console.error('Anthropic API error:', res.status, JSON.stringify(data));
+      const detail = data.error?.message || 'unknown';
       const friendlyError =
-        status === 401 ? 'API key is invalid — check it in Netlify environment variables.' :
-        status === 402 ? 'No credits on the Anthropic account — add billing at console.anthropic.com.' :
-        status === 403 ? 'API key does not have permission to use this model.' :
-        status === 429 ? 'Too many requests — wait a moment and try again.' :
-        `Anthropic error (${status}): ${detail || 'unknown'}`;
-      return {
-        statusCode: 502,
-        headers: corsHeaders(),
-        body: JSON.stringify({ error: friendlyError }),
-      };
+        res.status === 401 ? 'API key is invalid — check it in Cloudflare Pages environment variables.' :
+        res.status === 402 ? 'No credits on the Anthropic account — add billing at console.anthropic.com.' :
+        res.status === 403 ? 'API key does not have permission to use this model.' :
+        res.status === 429 ? 'Too many requests — wait a moment and try again.' :
+        `Anthropic error (${res.status}): ${detail}`;
+      return jsonResponse({ error: friendlyError }, 502);
     }
 
-    return {
-      statusCode: 200,
-      headers: { 'Content-Type': 'application/json', ...corsHeaders() },
-      body: JSON.stringify({ reply: data.content[0].text }),
-    };
+    return jsonResponse({ reply: data.content[0].text }, 200);
   } catch (err) {
     console.error('Function error:', err);
-    return {
-      statusCode: 500,
-      headers: corsHeaders(),
-      body: JSON.stringify({ error: 'Something went wrong — please try again.' }),
-    };
+    return jsonResponse({ error: 'Something went wrong — please try again.' }, 500);
   }
-};
+}
+
+function jsonResponse(obj, status) {
+  return new Response(JSON.stringify(obj), {
+    status,
+    headers: { 'Content-Type': 'application/json', ...corsHeaders() },
+  });
+}
 
 function corsHeaders() {
   return {
