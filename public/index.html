@@ -402,12 +402,24 @@
       margin-top: 48px;
     }
     .about-avatar {
-      width: 200px; height: 200px;
+      width: 240px; height: 240px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--brown), var(--latte));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 5rem;
+      overflow: hidden;
       flex-shrink: 0;
+      box-shadow: 0 8px 32px rgba(92,51,23,0.15);
+    }
+    .about-avatar img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: 50% 30%;
+    }
+    .session-card-img {
+      width: calc(100% + 60px);
+      margin: -36px -30px 24px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 20px 20px 0 0;
+      display: block;
     }
     .about-text { flex: 1; min-width: 260px; }
     .about-text p { color: var(--ash); font-size: 0.97rem; margin-bottom: 14px; }
@@ -497,6 +509,7 @@
     <div class="session-grid">
 
       <div class="session-card">
+        <img src="/images/barista-fundamentals.jpg" alt="Espresso machine pulling a shot" class="session-card-img">
         <div class="session-badge">Beginner Friendly</div>
         <h3>Barista Fundamentals</h3>
         <p>Zero experience? No problem. We cover the full journey — pulling espresso, steaming milk to the right texture, and finishing with your first latte art pour.</p>
@@ -509,6 +522,7 @@
       </div>
 
       <div class="session-card">
+        <img src="/images/latte-art.jpg" alt="Pouring milk for latte art" class="session-card-img">
         <div class="session-badge">Skill-Focused</div>
         <h3>Latte Art 1-on-1</h3>
         <p>Already making coffee but can't get consistent pours? We focus on fixing your milk texture and breaking down your pouring technique until it clicks.</p>
@@ -521,6 +535,7 @@
       </div>
 
       <div class="session-card" style="border-color: rgba(200,169,122,0.5); background: linear-gradient(160deg, #fdf8f2, #fff);">
+        <img src="/images/full-programme.jpg" alt="Barista working at a café machine" class="session-card-img" style="border-radius: 20px 20px 0 0;">
         <div class="session-badge" style="background: var(--espresso); color: var(--latte); border-color: var(--espresso);">Full Programme</div>
         <h3>The Full Barista Programme</h3>
         <p>Zero to café-ready. Two 3-hour sessions covering everything — espresso, milk, latte art, bar workflow, drink sequencing, and a real rush simulation. Walk out ready to work a bar.</p>
@@ -710,7 +725,7 @@
     <div class="section-label">Your Trainer</div>
     <h2 class="section-title">Make Coffee With Love</h2>
     <div class="about-inner">
-      <div class="about-avatar">☕</div>
+      <div class="about-avatar"><img src="/images/jimmy-profile.jpg" alt="Jimmy — barista trainer in Cairns"></div>
       <div class="about-text">
         <p>Hi, I'm Jimmy — a barista and coffee trainer based in Cairns. I'm originally from Taiwan, where I developed a deep love for coffee and tea culture that I now bring into every session.</p>
         <p>I train people 1-on-1 because I believe coffee is personal. Your machine, your taste, your goals. We work on what matters to you — not a generic curriculum.</p>
