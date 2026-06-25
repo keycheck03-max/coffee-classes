@@ -59,20 +59,35 @@
     /* ── HERO ── */
     .hero {
       min-height: 92vh;
-      background: linear-gradient(160deg, #2C1A0E 0%, #5C3317 55%, #C8A97A 100%);
+      background: #2C1A0E;
       display: flex; align-items: center; justify-content: center;
       text-align: center;
       padding: 80px 24px;
       position: relative;
       overflow: hidden;
     }
+    .hero-bg-slideshow {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+    .hero-bg-slide {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 1.8s ease-in-out;
+      will-change: opacity;
+    }
+    .hero-bg-slide.active { opacity: 1; }
     .hero::before {
       content: '';
       position: absolute; inset: 0;
-      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C8A97A' fill-opacity='0.06'%3E%3Ccircle cx='30' cy='30' r='28'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
-      opacity: 0.4;
+      background: linear-gradient(160deg, rgba(44,26,14,0.80) 0%, rgba(92,51,23,0.68) 55%, rgba(44,26,14,0.76) 100%);
+      z-index: 1;
     }
-    .hero-content { position: relative; max-width: 680px; }
+    .hero-content { position: relative; max-width: 680px; z-index: 2; }
     .hero-eyebrow {
       display: inline-block;
       background: rgba(200,169,122,0.2);
@@ -532,6 +547,7 @@
 
 <!-- HERO -->
 <div class="hero">
+  <div class="hero-bg-slideshow" id="heroSlideshow"></div>
   <div class="hero-content">
     <div class="hero-eyebrow">1-on-1 Coffee Training · Cairns, Australia</div>
     <h1>Learn to make coffee<br/><span>with love.</span></h1>
@@ -1290,6 +1306,61 @@
       input.focus();
     }
   }
+})();
+</script>
+
+<script>
+(function () {
+  const images = [
+    'images/gallery-student1.jpg',
+    'images/gallery-student2.jpg',
+    'images/gallery-student3.jpg',
+    'images/gallery-student4.jpg',
+    'images/gallery-student5.jpg',
+    'images/gallery-student6.jpg',
+    'images/gallery-student7.jpg',
+    'images/gallery-student8.jpg',
+    'images/gallery-student9.jpg',
+    'images/gallery-student10.jpg',
+    'images/gallery-student11.jpg',
+    'images/gallery-student12.jpg',
+    'images/gallery-student13.jpg',
+    'images/gallery-student14.jpg',
+    'images/gallery-student15.jpg',
+    'images/gallery-student16.jpg',
+    'images/gallery-student17.jpg',
+    'images/gallery-student18.jpg',
+    'images/gallery-student19.jpg',
+    'images/gallery-student20.jpg',
+    'images/gallery-teaching.jpg',
+    'images/gallery-rosetta.jpg',
+    'images/gallery-group1.jpg',
+    'images/gallery-group2.jpg',
+    'images/barista-fundamentals.jpg',
+    'images/latte-art.jpg',
+    'images/full-programme.jpg',
+  ];
+
+  const container = document.getElementById('heroSlideshow');
+  if (!container) return;
+
+  let current = 0;
+
+  images.forEach(function (src, i) {
+    const slide = document.createElement('div');
+    slide.className = 'hero-bg-slide' + (i === 0 ? ' active' : '');
+    slide.style.backgroundImage = 'url(' + src + ')';
+    container.appendChild(slide);
+  });
+
+  function advance() {
+    const slides = container.children;
+    slides[current].classList.remove('active');
+    current = (current + 1) % slides.length;
+    slides[current].classList.add('active');
+  }
+
+  setInterval(advance, 4500);
 })();
 </script>
 
