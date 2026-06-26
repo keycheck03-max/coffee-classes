@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude's Instagram Audit — @makecoffeewithlove</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0d0d0d;
+    color: #f0ece4;
+    font-family: 'Georgia', serif;
+    padding: 24px 16px 60px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    padding: 40px 0 32px;
+    border-bottom: 1px solid #333;
+    margin-bottom: 36px;
+  }
+  .header-label {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 12px;
+  }
+  .header-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #f0ece4;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .header-handle {
+    font-size: 16px;
+    color: #c8a97e;
+    letter-spacing: 1px;
+  }
+  .header-sub {
+    margin-top: 16px;
+    font-size: 13px;
+    color: #666;
+    font-family: 'Courier New', monospace;
+  }
+
+  /* ── SCORING NOTE ── */
+  .score-note {
+    background: #1a1a1a;
+    border-left: 3px solid #c8a97e;
+    padding: 14px 16px;
+    margin-bottom: 32px;
+    font-size: 12px;
+    color: #999;
+    font-family: 'Courier New', monospace;
+    line-height: 1.6;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    gap: 12px;
+  }
+
+  .rank-badge {
+    background: #c8a97e;
+    color: #0d0d0d;
+    font-weight: bold;
+    font-size: 18px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-family: 'Courier New', monospace;
+  }
+
+  .card-title {
+    flex: 1;
+    font-size: 15px;
+    font-weight: bold;
+    color: #f0ece4;
+    line-height: 1.4;
+  }
+
+  .card-date {
+    font-size: 11px;
+    color: #666;
+    font-family: 'Courier New', monospace;
+    white-space: nowrap;
+  }
+
+  /* ── METRICS ROW ── */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .metric {
+    background: #1e1e1e;
+    border-radius: 8px;
+    padding: 10px 8px;
+    text-align: center;
+  }
+
+  .metric-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: #f0ece4;
+    font-family: 'Courier New', monospace;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .metric-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #666;
+  }
+
+  .metric.highlight .metric-value { color: #c8a97e; }
+
+  /* ── HOOK TAG ── */
+  .hook-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-size: 10px;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+
+  .tag-hook { background: #2a2218; color: #c8a97e; border: 1px solid #3d3020; }
+  .tag-format { background: #1a1a2e; color: #8888cc; border: 1px solid #2a2a4a; }
+  .tag-community { background: #1e1a2e; color: #9977cc; border: 1px solid #332255; }
+  .tag-training { background: #1e2a1a; color: #77aa66; border: 1px solid #2a4422; }
+  .tag-image { background: #2a1a1a; color: #cc7766; border: 1px solid #442222; }
+
+  .hook-text {
+    font-size: 12px;
+    color: #888;
+    font-style: italic;
+    flex: 1;
+  }
+
+  /* ── VERDICT ROWS ── */
+  .verdict-row {
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+  }
+
+  .verdict-row.green {
+    background: #0d1f0f;
+    border-left: 3px solid #4caf50;
+  }
+
+  .verdict-row.red {
+    background: #1f0d0d;
+    border-left: 3px solid #f44336;
+  }
+
+  .verdict-label {
+    font-size: 10px;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .verdict-row.green .verdict-label { color: #4caf50; }
+  .verdict-row.red .verdict-label { color: #f44336; }
+
+  .verdict-text {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #d0ccc4;
+  }
+
+  .score-chip {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-family: 'Courier New', monospace;
+    color: #c8a97e;
+  }
+
+  /* ── DIVIDER ── */
+  .section-divider {
+    text-align: center;
+    margin: 36px 0 28px;
+    color: #444;
+    font-size: 11px;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 3px;
+  }
+
+  /* ── COMPARISON BLOCK ── */
+  .comparison {
+    background: #111;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 32px;
+  }
+  .comparison h3 {
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #c8a97e;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 16px;
+  }
+  .compare-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #1e1e1e;
+    font-size: 13px;
+  }
+  .compare-row:last-child { border-bottom: none; }
+  .compare-label { color: #888; }
+  .compare-a { color: #77aa66; font-weight: bold; font-family: 'Courier New', monospace; }
+  .compare-b { color: #f44336; font-weight: bold; font-family: 'Courier New', monospace; }
+
+  /* ── BLIND SPOT VERDICT ── */
+  .blind-spot {
+    background: #0d0d0d;
+    border: 2px solid #c8a97e;
+    border-radius: 12px;
+    padding: 32px 24px;
+    margin-top: 40px;
+    text-align: center;
+  }
+
+  .blind-spot-label {
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #c8a97e;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 24px;
+  }
+
+  .blind-spot-line {
+    font-size: 17px;
+    line-height: 1.7;
+    color: #f0ece4;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #222;
+  }
+  .blind-spot-line:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .blind-spot-line em {
+    color: #c8a97e;
+    font-style: normal;
+    font-weight: bold;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 48px;
+    font-size: 11px;
+    color: #444;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+  }
+
+  @media print {
+    body { background: #0d0d0d; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-label">Honest. No sugar-coating.</div>
+  <div class="header-title">Claude's Instagram Audit</div>
+  <div class="header-handle">@makecoffeewithlove</div>
+  <div class="header-sub">Analysed: 16 posts · Scored: Jun 2026 · Data via Windsor AI</div>
+</div>
+
+<!-- SCORING NOTE -->
+<div class="score-note">
+  WEIGHTED SCORE = Views + (Saves × 3) + (Shares × 3)<br>
+  Saves and shares weighted 3× because they signal real value and drive algorithm reach.<br>
+  Likes are vanity — they're excluded from the score.
+</div>
+
+<!-- ═══════════════════════════════════ -->
+<!-- CARD 1 -->
+<!-- ═══════════════════════════════════ -->
+<div class="card">
+  <div class="score-chip">Score: 2,342</div>
+  <div class="card-header">
+    <div class="rank-badge">1</div>
+    <div>
+      <div class="card-title">Cup Shape &amp; Taste Perception — The Science Post</div>
+      <div class="card-date">Feb 2025 · IMAGE</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric highlight"><div class="metric-value">2,330</div><div class="metric-label">Views</div></div>
+    <div class="metric"><div class="metric-value">2</div><div class="metric-label">Saves</div></div>
+    <div class="metric"><div class="metric-value">2</div><div class="metric-label">Shares</div></div>
+    <div class="metric"><div class="metric-value">593</div><div class="metric-label">Reach</div></div>
+  </div>
+  <div class="hook-row">
+    <span class="tag tag-hook">Hook</span>
+    <span class="hook-text">Educational curiosity — "Here's why your cup affects your coffee taste"</span>
+    <span class="tag tag-image">Image</span>
+  </div>
+  <div class="verdict-row green">
+    <div class="verdict-label">✓ What's Working</div>
+    <div class="verdict-text">Your highest-scoring post and it's not even a Reel. Educational depth creates saves. Coffee science speaks to your audience's genuine curiosity. The #jimmyscoffeetips series concept shows strategic thinking.</div>
+  </div>
+  <div class="verdict-row red">
+    <div class="verdict-label">✗ What's Holding It Back</div>
+    <div class="verdict-text">IMAGE format caps your reach at a fraction of what a Reel would get. Zero CTA to training — you educated people and sent them nowhere. No DM keyword. You could've ended with "DM me LATTE — I teach this live in session one."</div>
+  </div>
+</div>
+
+<!-- CARD 2 -->
+<div class="card">
+  <div class="score-chip">Score: 1,916</div>
+  <div class="card-header">
+    <div class="rank-badge">2</div>
+    <div>
+      <div class="card-title">Option-O Brew Battle Rehearsal</div>
+      <div class="card-date">Dec 2025 · REEL · 3.9s watch time</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric highlight"><div class="metric-value">1,904</div><div class="metric-label">Views</div></div>
+    <div class="metric"><div class="metric-value">0</div><div class="metric-label">Saves</div></div>
+    <div class="metric"><div class="metric-value">4</div><div class="metric-label">Shares</div></div>
+    <div class="metric"><div class="metric-value" style="color:#f44336">3.9s</div><div class="metric-label">Avg Watch</div></div>
+  </div>
+  <div class="hook-row">
+    <span class="tag tag-hook">Hook</span>
+    <span class="hook-text">Competition action footage</span>
+    <span class="tag tag-community">Community</span>
+  </div>
+  <div class="verdict-row green">
+    <div class="verdict-label">✓ What's Working</div>
+    <div class="verdict-text">High views and 4 shares — event content travels. Community energy is contagious and this reached new accounts outside your followers.</div>
+  </div>
+  <div class="verdict-row red">
+    <div class="verdict-label">✗ What's Holding It Back</div>
+    <div class="verdict-text">3.9 seconds average watch time — THE WORST in your entire account. People see the thumbnail and bounce. This is community content, not training content. It builds followers who never book a session. Zero training CTA.</div>
+  </div>
+</div>
+
+<!-- CARD 3 -->
+<div class="card">
+  <div class="score-chip">Score: 1,885</div>
+  <div class="card-header">
+    <div class="rank-badge">3</div>
+    <div>
+      <div class="card-title">Latte Art Training — Personal Story</div>
+      <div class="card-date">Nov 2025 · REEL · 8.1s watch time</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric highlight"><div class="metric-value">1,864</div><div class="metric-label">Views</div></div>
+    <div class="metric"><div class="metric-value">2</div><div class="metric-label">Saves</div></div>
+    <div class="metric"><div class="metric-value" style="color:#4caf50">5</div><div class="metric-label">Shares</div></div>
+    <div class="metric"><div class="metric-value">1,288</div><div class="metric-label">Reach</div></div>
+  </div>
+  <div class="hook-row">
+    <span class="tag tag-hook">Hook</span>
+    <span class="hook-text">Personal journey — "I was stuck for a year, now I teach this"</span>
+    <span class="tag tag-training">Training</span>
+  </div>
+  <div class="verdict-row green">
+    <div class="verdict-label">✓ What's Working</div>
+    <div class="verdict-text">YOUR BEST TRAINING CONTENT. 5 shares — your most-shared training reel. Personal story creates genuine connection. "I can help people make a swan in one class" is a powerful result statement. This is the template for what works.</div>
+  </div>
+  <div class="verdict-row red">
+    <div class="verdict-label">✗ What's Holding It Back</div>
+    <div class="verdict-text">"PM me" is a weak CTA with no keyword to track. The hook buries the lede — you start with your journey before telling them what's in it for them. Flip it: lead with the result first ("In one session, I'll take you from struggling to making a swan") — then share the story.</div>
+  </div>
+</div>
+
+<!-- CARD 4 -->
+<div class="card">
+  <div class="score-chip">Score: 1,649</div>
+  <div class="card-header">
+    <div class="rank-badge">4</div>
+    <div>
+      <div class="card-title">Option-O Brewing Battle Practice</div>
+      <div class="card-date">Dec 2025 · REEL · 10.5s watch time</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric highlight"><div class="metric-value">1,637</div><div class="metric-label">Views</div></div>
+    <div class="metric"><div class="metric-value">0</div><div class="metric-label">Saves</div></div>
+    <div class="metric"><div class="metric-value">4</div><div class="metric-label">Shares</div></div>
+    <div class="metric"><div class="metric-value">1,024</div><div class="metric-label">Reach</div></div>
+  </div>
+  <div class="hook-row">
+    <span class="tag tag-hook">Hook</span>
+    <span class="hook-text">Community event — "Come cheer your favourite baristas"</span>
+    <span class="tag tag-community">Community</span>
+  </div>
+  <div class="verdict-row green">
+    <div class="verdict-label">✓ What's Working</div>
+    <div class="verdict-text">10.5s watch time is solid. 4 shares shows community spread. Event hype works — people watch barista competitions with genuine interest.</div>
+  </div>
+  <div class="verdict-row red">
+    <div class="verdict-label">✗ What's Holding It Back</div>
+    <div class="verdict-text">Pure community content. 0 saves. No training angle. No booking CTA. This grows your community audience, not your paying students. These two groups are not the same.</div>
+  </div>
+</div>
+
+<!-- CARD 5 -->
+<div class="card">
+  <div class="score-chip">Score: 1,579</div>
+  <div class="card-header">
+    <div class="rank-badge">5</div>
+    <div>
+      <div class="card-title">Everyone Wants Latte Art — Behind the Scenes Reality</div>
+      <div class="card-date">Apr 2026 · IMAGE</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric highlight"><div class="metric-value">1,576</div><div class="metric-label">Views</div></div>
+    <div class="metric"><div class="metric-value">0</div><div class="metric-label">Saves</div></div>
+    <div class="metric"><div class="metric-value">1</div><div class="metric-label">Shares</div></div>
+    <div class="metric"><div class="metric-value">770</div><div class="metric-label">Reach</div></div>
+  </div>
+  <div class="hook-row">
+    <span class="tag tag-hook">Hook</span>
+    <span class="hook-text">"Everyone wants X — but this is what it really looks like"</span>
+    <span class="tag tag-image">Image</span>
+    <span class="tag tag-training">Training</span>
+  </div>
+  <div class="verdict-row green">
+    <div class="verdict-label">✓ What's Working</div>
+    <div class="verdict-text">THIS IS YOUR BEST HOOK FORMULA. "Everyone wants X / but this is what it actually looks like" is contrast storytelling — it works every time. Good CTA with DM keyword "LATTE". Pain points (milk not working, pour wrong) are specific and relatable. This is the direction.</div>
+  </div>
+  <div class="verdict-row red">
+    <div class="verdict-label">✗ What's Holding It Back</div>
+    <div class="verdict-text">You put your best hook on an IMAGE. This exact content — messy cups, real practice footage, contrast between expectation and reality — needs to be a Reel. Film it. Use this caption verbatim. Your views would double at minimum. You haven't repeated this hook formula once.</div>
+  </div>
+</div>
+
+<!-- CARD 6 -->
+<div class="card">
+  <div class="score-chip">Score: 1,201</div>
+  <div class="card-header">
+    <div class="rank-badge">6</div>
+    <div>
+      <div class="card-title">Option-O Event Recap — Winners Announced</div>
+      <div class="card-date">Dec 2025 · REEL · 13.9s watch time</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric highlight"><div class="metric-value">1,195</div><div class="metric-label">Views</div></div>
+    <div class="metric"><div class="metric-value">1</div><div class="metric-label">Saves</div></div>
+    <div class="metric"><div class="metric-value">1</div><div class="metric-label">Shares</div></div>
+    <div class="metric"><div class="metric-value" style="color:#4caf50">13.9s</div><div class="metric-label">Avg Watch</div></div>
+  </div>
+  <div class="hook-row">
+    <span class="tag tag-hook">Hook</span>
+    <span class="hook-text">Event documentary / winners reveal</span>
+    <span class="tag tag-community">Community</span>
+  </div>
+  <div class="verdict-row green">
+    <div class="verdict-label">✓ What's Working</div>
+    <div class="verdict-text">13.9s watch time — people stayed. Tagging winners and sponsors drives profile traffic from their followers. Community documentation has genuine watch-through value.</div>
+  </div>
+  <div class="verdict-row red">
+    <div class="verdict-label">✗ What's Holding It Back</div>
+    <div class="verdict-text">Zero training link. You hosted an event, got people watching for 14 seconds, and had nothing to redirect them to. "DM me BARISTA if you want to learn these skills" at the end costs you nothing and could convert spectators to students.</div>
+  </div>
+</div>
+
+<!-- CARD 7 -->
+<div class="card">
+  <div class="score-chip">Score: 1,179</div>
+  <div class="card-header">
+    <div class="rank-badge">7</div>
+    <div>
+      <div class="card-title">Cup Taster Practice II — Sensory Training Session</div>
+      <div class="card-date">Aug 2025 · REEL · ⚡ 17.4s watch time</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric highlight"><div class="metric-value">1,170</div><div class="metric-label">Views</div></div>
+    <div class="metric"><div class="metric-value">0</div><div class="metric-label">Saves</div></div>
+    <div class="metric"><div class="metric-value">3</div><div class="metric-label">Shares</div></div>
+    <div class="metric"><div class="metric-value" style="color:#4caf50">17.4s</div><div class="metric-label">Avg Watch</div></div>
+  </div>
+  <div class="hook-row">
+    <span class="tag tag-hook">Hook</span>
+    <span class="hook-text">"Cup Taster Practice II - 10 Aug" — barely a hook at all</span>
+    <span class="tag tag-community">Community</span>
+  </div>
+  <div class="verdict-row green">
+    <div class="verdict-label">✓ What's Working</div>
+    <div class="verdict-text">17.4 SECONDS — YOUR HIGHEST WATCH TIME IN THE ENTIRE ACCOUNT. The footage itself is so compelling that people watch nearly half of it with no hook, no caption, and no reason given. Cup tasting is genuinely fascinating to watch. 3 shares. This content format has serious potential.</div>
+  </div>
+  <div class="verdict-row red">
+    <div class="verdict-label">✗ What's Holding It Back</div>
+    <div class="verdict-text">Caption is just a title. No hook. No CTA. No hashtags. No training link. You have proof that people will watch your content for 17 seconds — and you gave them absolutely nothing to do next. This is the biggest missed opportunity in your account.</div>
+  </div>
+</div>
+
+<!-- CARD 8 -->
+<div class="card">
+  <div class="score-chip">Score: 959</div>
+  <div class="card-header">
+    <div class="rank-badge">8</div>
+    <div>
+      <div class="card-title">Cup Taster Practice p.6</div>
+      <div class="card-date">Aug 2025 · REEL · 16.1s watch time</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric highlight"><div class="metric-value">956</div><div class="metric-label">Views</div></div>
+    <div class="metric"><div class="metric-value">0</div><div class="metric-label">Saves</div></div>
+    <div class="metric"><div class="metric-value">1</div><div class="metric-label">Shares</div></div>
+    <div class="metric"><div class="metric-value" style="color:#4caf50">16.1s</div><div class="metric-label">Avg Watch</div></div>
+  </div>
+  <div class="hook-row">
+    <span class="tag tag-hook">Hook</span>
+    <span class="hook-text">Minimal — "Cup Taster Practice… Practice…Practise p.6"</span>
+    <span class="tag tag-community">Community</span>
+  </div>
+  <div class="verdict-row green">
+    <div class="verdict-label">✓ What's Working</div>
+    <div class="verdict-text">16.1s watch time confirms that cup tasting content is genuinely engaging — this isn't a fluke. People find this fascinating even without a real hook.</div>
+  </div>
+  <div class="verdict-row red">
+    <div class="verdict-label">✗ What's Holding It Back</div>
+    <div class="verdict-text">Same problem as #7 — no caption, no CTA, no hook. You have a repeatable content format that people love watching, and you're not optimising it at all. Add a proper hook and a training CTA and this becomes your growth engine.</div>
+  </div>
+</div>
+
+<!-- CARD 9 -->
+<div class="card">
+  <div class="score-chip">Score: 861</div>
+  <div class="card-header">
+    <div class="rank-badge">9</div>
+    <div>
+      <div class="card-title">Roasting Profiles Cupping x Kate</div>
+      <div class="card-date">Aug 2025 · REEL · 13.3s watch time</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric highlight"><div class="metric-value">843</div><div class="metric-label">Views</div></div>
+    <div class="metric"><div class="metric-value" style="color:#4caf50">3</div><div class="metric-label">Saves</div></div>
+    <div class="metric"><div class="metric-value" style="color:#4caf50">3</div><div class="metric-label">Shares</div></div>
+    <div class="metric"><div class="metric-value">13.3s</div><div class="metric-label">Avg Watch</div></div>
+  </div>
+  <div class="hook-row">
+    <span class="tag tag-hook">Hook</span>
+    <span class="hook-text">Collaboration — educational event with a guest expert</span>
+    <span class="tag tag-community">Community</span>
+  </div>
+  <div class="verdict-row green">
+    <div class="verdict-label">✓ What's Working</div>
+    <div class="verdict-text">Your best save AND share rate in one post — 3 each. Collaboration with a credible guest (Kate) lends authority. 13.3s watch time. Guest collabs spread because two audiences are watching. This formula works.</div>
+  </div>
+  <div class="verdict-row red">
+    <div class="verdict-label">✗ What's Holding It Back</div>
+    <div class="verdict-text">Pure @cairnscoffeecommunity content. No training angle, no booking CTA. You've proved collab content spreads — now do a collab that bridges to your training business (e.g. film someone's transformation with their permission).</div>
+  </div>
+</div>
+
+<!-- CARD 10 -->
+<div class="card">
+  <div class="score-chip">Score: 808</div>
+  <div class="card-header">
+    <div class="rank-badge">10</div>
+    <div>
+      <div class="card-title">Practice Session Footage (No Caption)</div>
+      <div class="card-date">Jan 2026 · REEL · 13.8s watch time</div>
+    </div>
+  </div>
+  <div class="metrics">
+    <div class="metric highlight"><div class="metric-value">802</div><div class="metric-label">Views</div></div>
+    <div class="metric"><div class="metric-value">2</div><div class="metric-label">Saves</div></div>
+    <div class="metric"><div class="metric-value">0</div><div class="metric-label">Shares</div></div>
+    <div class="metric"><div class="metric-value" style="color:#4caf50">13.8s</div><div class="metric-label">Avg Watch</div></div>
+  </div>
+  <div class="hook-row">
+    <span class="tag tag-hook">Hook</span>
+    <span class="hook-text">None — no caption at all</span>
+    <span class="tag tag-training">Training</span>
+  </div>
+  <div class="verdict-row green">
+    <div class="verdict-label">✓ What's Working</div>
+    <div class="verdict-text">13.8s watch time and 2 saves with ZERO caption or hook. The footage alone is compelling enough to make people save it. This tells you the raw content quality is there.</div>
+  </div>
+  <div class="verdict-row red">
+    <div class="verdict-label">✗ What's Holding It Back</div>
+    <div class="verdict-text">You posted a Reel with no caption, no hook, no hashtags, no CTA, and no training link. People saved this and you gave them no way to follow up. Every reel without a caption is a missed conversion. Never post without a caption again.</div>
+  </div>
+</div>
+
+<!-- ─── THE BRUTAL COMPARISON ─── -->
+<div class="section-divider">── THE REAL PROBLEM ──</div>
+
+<div class="comparison">
+  <h3>Community Content vs. Training Content — Head to Head</h3>
+  <div class="compare-row">
+    <div class="compare-label">Metric</div>
+    <div class="compare-a">Community Reels</div>
+    <div class="compare-b">Training Reels (2026)</div>
+  </div>
+  <div class="compare-row">
+    <div class="compare-label">Avg Views</div>
+    <div class="compare-a">1,247</div>
+    <div class="compare-b">886</div>
+  </div>
+  <div class="compare-row">
+    <div class="compare-label">Avg Watch Time</div>
+    <div class="compare-a">13.8s</div>
+    <div class="compare-b">6.9s</div>
+  </div>
+  <div class="compare-row">
+    <div class="compare-label">Total Shares</div>
+    <div class="compare-a">20</div>
+    <div class="compare-b">0</div>
+  </div>
+  <div class="compare-row">
+    <div class="compare-label">Total Saves</div>
+    <div class="compare-a">6</div>
+    <div class="compare-b">3</div>
+  </div>
+  <div class="compare-row">
+    <div class="compare-label">Drives Bookings?</div>
+    <div class="compare-a" style="color:#f44336">No CTA</div>
+    <div class="compare-b" style="color:#f44336">No Conversions</div>
+  </div>
+</div>
+
+<!-- ─── BLIND SPOT VERDICT ─── -->
+<div class="blind-spot">
+  <div class="blind-spot-label">⚠ Claude's Verdict — 3 Biggest Blind Spots</div>
+
+  <div class="blind-spot-line">
+    <em>01 / Your community content outperforms your training content on every metric — but neither is converting to bookings.</em>
+    You have two audiences (community enthusiasts and training students) and you're posting for the first group while trying to sell to the second.
+  </div>
+
+  <div class="blind-spot-line">
+    <em>02 / You have 17-second watch time footage that you're wasting with empty captions.</em>
+    Cup tasting content keeps people glued for 17 seconds — twice your training content. Add a hook and a CTA and this becomes your growth engine overnight.
+  </div>
+
+  <div class="blind-spot-line">
+    <em>03 / You found your best hook formula once ("Everyone wants X / but this is what it really looks like") then never used it again.</em>
+    Post #5 is the blueprint. Film it as a Reel. Repeat the formula weekly. That one structure, on video, with your morning café opening and student session footage, is the content that will fill your calendar.
+  </div>
+</div>
+
+<div class="footer">
+  Claude's Instagram Audit · @makecoffeewithlove · June 2026<br>
+  Data: Windsor AI · Weighted Score = Views + (Saves×3) + (Shares×3)
+</div>
+
+</body>
+</html>
