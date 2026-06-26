@@ -31,22 +31,21 @@
     /* ── NAV ── */
     nav {
       position: sticky; top: 0; z-index: 100;
-      background: linear-gradient(to bottom, rgba(44,26,14,0.55) 0%, rgba(44,26,14,0.05) 100%);
-      backdrop-filter: none;
-      border-bottom: 1px solid transparent;
+      background: rgba(200,169,122,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(200,169,122,0.3);
       padding: 16px 32px;
       display: flex; align-items: center; justify-content: space-between;
-      transition: background 0.3s, border-color 0.3s, backdrop-filter 0.3s;
+      transition: background 0.3s, border-color 0.3s;
     }
     nav.nav-scrolled {
       background: rgba(44,26,14,0.95);
-      backdrop-filter: blur(10px);
       border-bottom-color: rgba(200,169,122,0.2);
     }
     .nav-brand {
       font-family: 'Playfair Display', serif;
       font-size: 1.2rem;
-      color: #fff;
+      color: var(--espresso);
       font-weight: 700;
       letter-spacing: 0.02em;
       transition: color 0.3s;
@@ -54,7 +53,7 @@
     nav.nav-scrolled .nav-brand { color: var(--latte); }
     nav a {
       text-decoration: none;
-      color: rgba(255,255,255,0.85);
+      color: var(--espresso);
       font-size: 0.85rem;
       font-weight: 500;
       letter-spacing: 0.05em;
@@ -63,7 +62,7 @@
       transition: color 0.2s;
     }
     nav.nav-scrolled a { color: rgba(255,255,255,0.75); }
-    nav a:hover { color: var(--latte); }
+    nav a:hover { color: var(--brown); }
     nav.nav-scrolled a:hover { color: var(--latte); }
 
     /* ── HERO ── */
