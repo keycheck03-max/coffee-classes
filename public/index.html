@@ -31,22 +31,30 @@
     /* ── NAV ── */
     nav {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(255,253,248,0.92);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(200,169,122,0.25);
+      background: transparent;
+      backdrop-filter: none;
+      border-bottom: 1px solid transparent;
       padding: 16px 32px;
       display: flex; align-items: center; justify-content: space-between;
+      transition: background 0.3s, border-color 0.3s, backdrop-filter 0.3s;
+    }
+    nav.nav-scrolled {
+      background: rgba(255,253,248,0.92);
+      backdrop-filter: blur(10px);
+      border-bottom-color: rgba(200,169,122,0.25);
     }
     .nav-brand {
       font-family: 'Playfair Display', serif;
       font-size: 1.2rem;
-      color: var(--brown);
+      color: #fff;
       font-weight: 700;
       letter-spacing: 0.02em;
+      transition: color 0.3s;
     }
+    nav.nav-scrolled .nav-brand { color: var(--brown); }
     nav a {
       text-decoration: none;
-      color: var(--ash);
+      color: rgba(255,255,255,0.85);
       font-size: 0.85rem;
       font-weight: 500;
       letter-spacing: 0.05em;
@@ -54,7 +62,9 @@
       margin-left: 28px;
       transition: color 0.2s;
     }
-    nav a:hover { color: var(--brown); }
+    nav.nav-scrolled a { color: var(--ash); }
+    nav a:hover { color: var(--latte); }
+    nav.nav-scrolled a:hover { color: var(--brown); }
 
     /* ── HERO ── */
     .hero {
@@ -1199,6 +1209,13 @@
 </div>
 
 <script>
+(function () {
+  const nav = document.querySelector('nav');
+  function updateNav() { nav.classList.toggle('nav-scrolled', window.scrollY > 60); }
+  window.addEventListener('scroll', updateNav, { passive: true });
+  updateNav();
+})();
+
 (function () {
   const widget   = document.getElementById('chat-widget');
   const panel    = document.getElementById('chat-panel');
