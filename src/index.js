@@ -71,7 +71,7 @@ export default {
     // A/B test: 50/50 split on homepage only
     if (url.pathname === '/' || url.pathname === '') {
       const cookies = request.headers.get('cookie') || '';
-      let variant = getCookieValue(cookies, 'ab');
+      let variant = url.searchParams.get('ab') || getCookieValue(cookies, 'ab');
       if (!variant) {
         variant = Math.random() < 0.5 ? 'a' : 'b';
       }
