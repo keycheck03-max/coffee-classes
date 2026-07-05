@@ -68,14 +68,11 @@ export default {
       return new Response('Method Not Allowed', { status: 405 });
     }
 
-    // A/B test: 50/50 split on homepage only
+    // Serve Version B for all visitors
     if (url.pathname === '/' || url.pathname === '') {
       const cookies = request.headers.get('cookie') || '';
-      let variant = url.searchParams.get('ab') || getCookieValue(cookies, 'ab');
-      if (!variant) {
-        variant = Math.random() < 0.5 ? 'a' : 'b';
-      }
-      const assetPath = variant === 'b' ? '/index-b.html' : '/index.html';
+      let variant = url.searchParams.get('ab') || getCookieValue(cookies, 'ab') || 'b';
+      const assetPath = variant === 'a' ? '/index.html' : '/index-b.html';
       const assetReq = new Request(new URL(assetPath, url).toString(), request);
       const assetRes = await env.ASSETS.fetch(assetReq);
       const res = new Response(assetRes.body, assetRes);
