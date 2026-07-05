@@ -1,0 +1,16 @@
+{
+  "name": "coffee-classes",
+  "private": true,
+  "scripts": {
+    "test": "jest",
+    "lint:html": "html-validate index.html make-coffee-with-love-booking.html"
+  },
+  "devDependencies": {
+    "axe-core": "^4.9.0",
+    "cheerio": "^1.0.0",
+    "html-validate": "^8.0.0",
+    "jest": "^29.0.0",
+    "jest-axe": "^8.0.0",
+    "jest-environment-jsdom": "^29.0.0"
+  }
+}
