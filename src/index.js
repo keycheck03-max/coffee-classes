@@ -68,27 +68,9 @@ export default {
       return new Response('Method Not Allowed', { status: 405 });
     }
 
-    // Serve Version B for all visitors
-    if (url.pathname === '/' || url.pathname === '') {
-      const cookies = request.headers.get('cookie') || '';
-      let variant = url.searchParams.get('ab') || getCookieValue(cookies, 'ab') || 'b';
-      const assetPath = variant === 'a' ? '/index.html' : '/index-b.html';
-      const assetReq = new Request(new URL(assetPath, url).toString(), request);
-      const assetRes = await env.ASSETS.fetch(assetReq);
-      const res = new Response(assetRes.body, assetRes);
-      res.headers.append('Set-Cookie', `ab=${variant}; Path=/; Max-Age=2592000; SameSite=Lax`);
-      res.headers.set('X-AB-Variant', variant);
-      return res;
-    }
-
     return env.ASSETS.fetch(request);
   },
 };
-
-function getCookieValue(cookieStr, name) {
-  const match = cookieStr.match(new RegExp('(?:^|;\\s*)' + name + '=([^;]+)'));
-  return match ? match[1] : null;
-}
 
 async function handleChat(request, env) {
   const apiKey = env.ANTHROPIC_API_KEY;
