@@ -1,0 +1,413 @@
+<title>Monthly Report · @makecoffeewithlove</title>
+
+<style>
+:root {
+  --ground:    #F2EFE8;
+  --surface:   #FFFFFF;
+  --surface-2: #F8F6F1;
+  --ink-1:     #1B1814;
+  --ink-2:     #63594F;
+  --ink-3:     #9A8E83;
+  --accent:    #B8741A;
+  --accent-bg: #F4E3C4;
+  --chart-1:   #B8741A;
+  --chart-2:   #4E8A70;
+  --chart-3:   #5A7FAB;
+  --up:        #006300;
+  --down:      #C53030;
+  --warn:      #8A5C00;
+  --grid:      #DDD9D0;
+  --border:    #E3DDD5;
+  --r-sm: 6px; --r-md: 10px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --ground:#0F0D0B;--surface:#1C1915;--surface-2:#141210;
+  --ink-1:#F2EFE8;--ink-2:#A89880;--ink-3:#6E6156;
+  --accent:#E09840;--accent-bg:#2A1E08;--chart-1:#E09840;--chart-2:#7EC4A4;--chart-3:#85AFDB;
+  --up:#3DB85F;--down:#E06060;--warn:#E09840;--grid:#2A251E;--border:#302820;
+}}
+:root[data-theme="light"]{--ground:#F2EFE8;--surface:#FFFFFF;--surface-2:#F8F6F1;--ink-1:#1B1814;--ink-2:#63594F;--ink-3:#9A8E83;--accent:#B8741A;--accent-bg:#F4E3C4;--chart-1:#B8741A;--chart-2:#4E8A70;--chart-3:#5A7FAB;--up:#006300;--down:#C53030;--warn:#8A5C00;--grid:#DDD9D0;--border:#E3DDD5;}
+:root[data-theme="dark"]{--ground:#0F0D0B;--surface:#1C1915;--surface-2:#141210;--ink-1:#F2EFE8;--ink-2:#A89880;--ink-3:#6E6156;--accent:#E09840;--accent-bg:#2A1E08;--chart-1:#E09840;--chart-2:#7EC4A4;--chart-3:#85AFDB;--up:#3DB85F;--down:#E06060;--warn:#E09840;--grid:#2A251E;--border:#302820;}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--ground);color:var(--ink-1);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:14px;line-height:1.5;padding:24px 16px 48px;-webkit-font-smoothing:antialiased;}
+.report{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:12px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:20px 22px;}
+.sec-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-bottom:14px;display:block;}
+.up{color:var(--up);font-weight:600;}
+.dn{color:var(--down);font-weight:600;}
+
+/* Header */
+.report-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:20px 22px;}
+.hd-eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:6px;}
+.hd-account{font-size:22px;font-weight:800;letter-spacing:-.4px;line-height:1;}
+.hd-sub{font-size:12px;color:var(--ink-2);margin-top:3px;}
+.hd-right{text-align:right;flex-shrink:0;}
+.period-badge{display:inline-block;background:var(--accent-bg);color:var(--accent);font-size:11px;font-weight:700;letter-spacing:.03em;padding:5px 12px;border-radius:20px;}
+.source-note{font-size:11px;color:var(--ink-3);margin-top:6px;}
+
+/* KPI Grid */
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.kpi-tile{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:16px 18px;transition:box-shadow .15s ease;}
+@media(prefers-reduced-motion:reduce){.kpi-tile{transition:none;}}
+.kpi-tile:hover{box-shadow:0 2px 12px rgba(0,0,0,.07);}
+.kpi-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-bottom:8px;display:block;}
+.kpi-val{font-size:36px;font-weight:800;letter-spacing:-1.2px;line-height:1;font-variant-numeric:tabular-nums;color:var(--ink-1);margin-bottom:7px;}
+.kpi-sub{font-size:11px;color:var(--ink-3);}
+.kpi-tile.alert{border-color:var(--down);}
+.kpi-tile.alert .kpi-val{color:var(--down);}
+.kpi-tile.accent-tile{border-color:var(--accent);}
+
+/* Funnel — the full pipeline */
+.funnel-wrap{margin-top:14px;}
+.funnel-stage{display:flex;align-items:center;gap:0;position:relative;}
+.funnel-bar-col{flex:1;display:flex;flex-direction:column;align-items:stretch;}
+.f-block{
+  background:var(--surface-2);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:12px 14px;
+  display:flex;align-items:center;gap:10px;
+}
+.f-block.highlight{background:var(--accent-bg);border-color:var(--accent);}
+.f-block.problem{background:color-mix(in srgb,var(--surface-2) 85%,var(--down));border-color:var(--down);}
+.f-icon{font-size:14px;min-width:18px;}
+.f-name{flex:1;font-size:13px;color:var(--ink-2);font-weight:500;}
+.f-val{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink-1);min-width:50px;text-align:right;}
+.f-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;white-space:nowrap;flex-shrink:0;}
+.f-badge.ok{background:color-mix(in srgb,var(--surface-2) 50%,var(--up));color:var(--up);}
+.f-badge.warn{background:var(--accent-bg);color:var(--accent);}
+.f-badge.bad{background:color-mix(in srgb,var(--surface-2) 60%,var(--down));color:var(--down);}
+.funnel-arrow{text-align:center;font-size:11px;color:var(--ink-3);padding:4px 0;line-height:1;}
+.funnel-arrow span{display:inline-block;}
+.funnel-gap-box{
+  background:var(--accent-bg);border-left:3px solid var(--accent);
+  border-radius:0 var(--r-sm) var(--r-sm) 0;
+  padding:10px 14px;margin-top:12px;
+}
+.funnel-gap-title{font-size:11px;font-weight:700;color:var(--warn);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.funnel-gap-body{font-size:12px;color:var(--ink-2);line-height:1.6;}
+
+/* Content type chart */
+.content-type-rows{display:flex;flex-direction:column;gap:10px;margin-top:14px;}
+.ct-row{display:flex;align-items:center;gap:10px;}
+.ct-label{font-size:12px;font-weight:600;color:var(--ink-2);min-width:50px;}
+.ct-track{flex:1;height:22px;background:var(--surface-2);border-radius:4px;overflow:hidden;position:relative;}
+.ct-fill{height:100%;border-radius:4px;transition:width .4s ease;}
+.ct-fill.reels{background:var(--chart-1);}
+.ct-fill.stories{background:var(--chart-2);}
+.ct-fill.posts{background:var(--chart-3);}
+.ct-num{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink-1);min-width:52px;text-align:right;}
+.ct-pct{font-size:10px;color:var(--ink-3);min-width:36px;text-align:right;}
+
+/* Top reels */
+.top-reels{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;}
+.reel-card{background:var(--surface-2);border-radius:var(--r-sm);padding:12px 10px;text-align:center;}
+.reel-rank{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin-bottom:6px;}
+.reel-views{font-size:20px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums;color:var(--ink-1);line-height:1;}
+.reel-type{font-size:9px;color:var(--ink-3);margin-top:3px;}
+
+/* Engagement grid */
+.eng-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;}
+.eng-item{background:var(--surface-2);border-radius:var(--r-sm);padding:12px;text-align:center;}
+.eng-n{font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1;font-variant-numeric:tabular-nums;color:var(--ink-1);}
+.eng-n.zero{color:var(--down);}
+.eng-n.low{color:var(--warn);}
+.eng-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin-top:4px;font-weight:600;}
+
+/* By content type interaction split */
+.int-split{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+.int-cell{background:var(--surface-2);border-radius:var(--r-sm);padding:8px 10px;text-align:center;}
+.int-cell-val{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink-1);}
+.int-cell-key{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin-top:2px;}
+.int-cell.top{border-top:2px solid var(--chart-1);}
+.int-cell.mid{border-top:2px solid var(--chart-2);}
+.int-cell.low-c{border-top:2px solid var(--chart-3);}
+
+/* Priorities */
+.priority-list{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+.pi{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:var(--surface-2);border-radius:var(--r-sm);border-left:3px solid transparent;}
+.pi.crit{border-left-color:var(--down);}
+.pi.warn{border-left-color:var(--accent);}
+.pi.ok{border-left-color:var(--up);}
+.pi-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px;background:var(--down);}
+.pi.warn .pi-dot{background:var(--accent);}
+.pi.ok .pi-dot{background:var(--up);}
+.pi-body strong{display:block;font-size:13px;font-weight:600;color:var(--ink-1);margin-bottom:3px;}
+.pi-body span{font-size:12px;color:var(--ink-2);line-height:1.5;}
+
+/* Footer */
+.report-footer{text-align:center;font-size:11px;color:var(--ink-3);padding-top:8px;letter-spacing:.02em;}
+
+@media(max-width:540px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .top-reels{grid-template-columns:repeat(2,1fr);}
+  .eng-grid{grid-template-columns:repeat(2,1fr);}
+  .int-split{grid-template-columns:1fr 1fr 1fr;}
+  body{padding:14px 12px 36px;}
+  .kpi-val{font-size:28px;}
+  .hd-account{font-size:18px;}
+}
+</style>
+
+<div class="report">
+
+  <!-- Header -->
+  <header class="report-header">
+    <div>
+      <div class="hd-eyebrow">Monthly Report — Instagram Insights</div>
+      <div class="hd-account">@makecoffeewithlove</div>
+      <div class="hd-sub">Jimmy · Barista Training Cairns</div>
+    </div>
+    <div class="hd-right">
+      <div class="period-badge">Last 30 Days</div>
+      <div class="source-note">Source: Instagram app screenshots</div>
+    </div>
+  </header>
+
+  <!-- KPI Grid -->
+  <div class="kpi-grid">
+    <div class="kpi-tile">
+      <span class="kpi-lbl">Accounts Reached</span>
+      <div class="kpi-val">5,449</div>
+      <div class="kpi-sub">unique people</div>
+    </div>
+    <div class="kpi-tile">
+      <span class="kpi-lbl">Total Views</span>
+      <div class="kpi-val">12.9K</div>
+      <div class="kpi-sub">Reels + Stories + Posts</div>
+    </div>
+    <div class="kpi-tile">
+      <span class="kpi-lbl">Total Interactions</span>
+      <div class="kpi-val">245</div>
+      <div class="kpi-sub">4.5% engagement rate</div>
+    </div>
+    <div class="kpi-tile accent-tile">
+      <span class="kpi-lbl">Profile Visits</span>
+      <div class="kpi-val">265</div>
+      <div class="kpi-sub">4.9% of reached — ✓ on target</div>
+    </div>
+    <div class="kpi-tile accent-tile">
+      <span class="kpi-lbl">Bio Link Taps</span>
+      <div class="kpi-val">18</div>
+      <div class="kpi-sub">6.8% of visitors — ⚠ target 15%</div>
+    </div>
+    <div class="kpi-tile alert">
+      <span class="kpi-lbl">⚠ Save Rate</span>
+      <div class="kpi-val">3</div>
+      <div class="kpi-sub">0.06% save rate — target 2%</div>
+    </div>
+  </div>
+
+  <!-- The Full Booking Funnel -->
+  <div class="card">
+    <span class="sec-lbl">Booking Funnel — Complete Picture</span>
+    <div class="funnel-wrap">
+
+      <div class="f-block">
+        <span class="f-icon">📡</span>
+        <span class="f-name">Accounts Reached</span>
+        <span class="f-val">5,449</span>
+        <span class="f-badge ok">baseline</span>
+      </div>
+      <div class="funnel-arrow"><span>↓ 4.9% converted to profile visits</span></div>
+
+      <div class="f-block highlight">
+        <span class="f-icon">👤</span>
+        <span class="f-name">Profile Visits</span>
+        <span class="f-val">265</span>
+        <span class="f-badge ok">4.9% ✓</span>
+      </div>
+      <div class="funnel-arrow"><span>↓ only 6.8% clicked through — gap here</span></div>
+
+      <div class="f-block problem">
+        <span class="f-icon">🔗</span>
+        <span class="f-name">Bio Link Taps</span>
+        <span class="f-val">18</span>
+        <span class="f-badge bad">6.8% ✗ target 15%</span>
+      </div>
+      <div class="funnel-arrow"><span>↓ est. 20–30% book after clicking</span></div>
+
+      <div class="f-block">
+        <span class="f-icon">📅</span>
+        <span class="f-name">Est. Calendly Bookings</span>
+        <span class="f-val">3–5</span>
+        <span class="f-badge warn">est. from link taps</span>
+      </div>
+      <div class="funnel-arrow"><span>↓ at $180/session</span></div>
+
+      <div class="f-block">
+        <span class="f-icon">💰</span>
+        <span class="f-name">Est. Revenue from Instagram</span>
+        <span class="f-val">$540–900</span>
+        <span class="f-badge warn">per month</span>
+      </div>
+
+    </div>
+
+    <div class="funnel-gap-box">
+      <div class="funnel-gap-title">The gap that's costing you bookings</div>
+      <div class="funnel-gap-body">
+        265 people visited your profile. Only 18 tapped the link — a 6.8% conversion when the target is 15%. <strong style="color:var(--ink-1);">If you doubled that to 13.6% (still below target), you'd get 36 link taps, roughly 7–10 bookings/month instead of 3–5.</strong> This is a bio problem, not a content problem. Your content is driving profile visits just fine — the profile isn't converting them.
+      </div>
+    </div>
+  </div>
+
+  <!-- Views by content type -->
+  <div class="card">
+    <span class="sec-lbl">Views by Content Type</span>
+    <div class="content-type-rows">
+      <div class="ct-row">
+        <span class="ct-label">Reels</span>
+        <div class="ct-track"><div class="ct-fill reels" style="width:100%"></div></div>
+        <span class="ct-num">7,800</span>
+        <span class="ct-pct">60%</span>
+      </div>
+      <div class="ct-row">
+        <span class="ct-label">Stories</span>
+        <div class="ct-track"><div class="ct-fill stories" style="width:60%"></div></div>
+        <span class="ct-num">4,700</span>
+        <span class="ct-pct">36%</span>
+      </div>
+      <div class="ct-row">
+        <span class="ct-label">Posts</span>
+        <div class="ct-track"><div class="ct-fill posts" style="width:5.8%"></div></div>
+        <span class="ct-num">449</span>
+        <span class="ct-pct">3%</span>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--ink-3);margin-top:12px;line-height:1.6;">
+      Posts are generating almost no views — 449 vs 7,800 for Reels. Every hour spent on a static post could generate 17× more views as a Reel. Static posts are not worth your time right now.
+    </p>
+  </div>
+
+  <!-- Top Reels -->
+  <div class="card">
+    <span class="sec-lbl">Top 4 Reels by Views</span>
+    <div class="top-reels">
+      <div class="reel-card">
+        <div class="reel-rank">#1</div>
+        <div class="reel-views">2,700</div>
+        <div class="reel-type">views</div>
+      </div>
+      <div class="reel-card">
+        <div class="reel-rank">#2</div>
+        <div class="reel-views">2,600</div>
+        <div class="reel-type">views</div>
+      </div>
+      <div class="reel-card">
+        <div class="reel-rank">#3</div>
+        <div class="reel-views">1,800</div>
+        <div class="reel-type">views</div>
+      </div>
+      <div class="reel-card">
+        <div class="reel-rank">#4</div>
+        <div class="reel-views">1,200</div>
+        <div class="reel-type">views</div>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--ink-3);margin-top:12px;line-height:1.6;">
+      Your top 4 Reels account for 8,300 of your 12,900 total views (64%). The content is working — now it needs a clearer path to booking.
+    </p>
+  </div>
+
+  <!-- Engagement detail -->
+  <div class="card">
+    <span class="sec-lbl">Engagement Detail — 30 Days</span>
+    <div class="eng-grid">
+      <div class="eng-item">
+        <div class="eng-n">~218</div>
+        <div class="eng-lbl">Likes</div>
+      </div>
+      <div class="eng-item">
+        <div class="eng-n zero">0</div>
+        <div class="eng-lbl">Comments</div>
+      </div>
+      <div class="eng-item">
+        <div class="eng-n low">3</div>
+        <div class="eng-lbl">Saves</div>
+      </div>
+      <div class="eng-item">
+        <div class="eng-n low">16</div>
+        <div class="eng-lbl">Shares</div>
+      </div>
+    </div>
+    <span class="sec-lbl" style="margin-top:16px;margin-bottom:10px;">Interactions by content format</span>
+    <div class="int-split">
+      <div class="int-cell top">
+        <div class="int-cell-val">177</div>
+        <div class="int-cell-key">Reels</div>
+      </div>
+      <div class="int-cell mid">
+        <div class="int-cell-val">65</div>
+        <div class="int-cell-key">Stories</div>
+      </div>
+      <div class="int-cell low-c">
+        <div class="int-cell-val">3</div>
+        <div class="int-cell-key">Posts</div>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--ink-3);margin-top:12px;line-height:1.6;">
+      Stories generated 65 interactions including 8 replies and 11 shares — more active community signal than their view count suggests. Replies to Stories are direct conversations; keep posting Stories daily.
+    </p>
+  </div>
+
+  <!-- Priorities -->
+  <div class="card">
+    <span class="sec-lbl">Top Priorities for Next 30 Days</span>
+    <div class="priority-list">
+
+      <div class="pi crit">
+        <div class="pi-dot"></div>
+        <div class="pi-body">
+          <strong>Fix the bio — this is costing you 3–5 bookings per month</strong>
+          <span>265 people visited your profile, only 18 tapped the link (6.8%). The target is 15%. Your bio needs to answer: "Who is this for, what will I get, and where do I go?" Try: "Private barista training in Cairns · Latte art + espresso fundamentals · 1-on-1 · Book below ↓". One line, dead clear.</span>
+        </div>
+      </div>
+
+      <div class="pi crit">
+        <div class="pi-dot"></div>
+        <div class="pi-body">
+          <strong>Zero comments in 30 days — no conversations = no community signal</strong>
+          <span>The algorithm treats comments as proof that content matters. You have 0. End every Reel caption with a direct question — not "let me know what you think" but something specific: "Which would you find harder to learn — milk texture or latte art technique?"</span>
+        </div>
+      </div>
+
+      <div class="pi crit">
+        <div class="pi-dot"></div>
+        <div class="pi-body">
+          <strong>3 saves in 30 days — saves are how you grow reach without posting</strong>
+          <span>A save tells Instagram to keep showing your content to new people. 3 saves in a month is almost nothing. Create one "reference" post per week — a checklist, a common mistake breakdown, a comparison. People save things they plan to return to.</span>
+        </div>
+      </div>
+
+      <div class="pi warn">
+        <div class="pi-dot"></div>
+        <div class="pi-body">
+          <strong>Stop making static Posts — they generate 17× fewer views than Reels</strong>
+          <span>Posts: 449 views. Reels: 7,800 views. Same effort, completely different results. Every piece of content should be a Reel or a Story. If it can't move, make it a Story poll or question instead.</span>
+        </div>
+      </div>
+
+      <div class="pi warn">
+        <div class="pi-dot"></div>
+        <div class="pi-body">
+          <strong>Stories are working for community — keep going, add a link sticker weekly</strong>
+          <span>65 story interactions, 8 replies, 11 shares — your Stories audience is active. Add a link sticker on Stories at least once a week pointing directly to your Calendly booking link. This creates a second path to booking beyond the bio.</span>
+        </div>
+      </div>
+
+      <div class="pi ok">
+        <div class="pi-dot"></div>
+        <div class="pi-body">
+          <strong>Content is driving profile visits — keep the Reel format going</strong>
+          <span>4.9% profile visit rate is almost exactly on target (5%). Your top Reel hit 2,700 views. The content is working. The problem is downstream — bio and booking path, not the content itself. Don't change what's working.</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="report-footer">
+    Last 30 days · @makecoffeewithlove · Source: Instagram Insights (Aug 5, 2026)
+  </footer>
+
+</div>

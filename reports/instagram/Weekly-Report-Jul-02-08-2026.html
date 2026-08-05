@@ -1,0 +1,569 @@
+<title>Weekly Report · @makecoffeewithlove</title>
+
+<style>
+/* ── Palette tokens ───────────────────────────────────── */
+:root {
+  --ground:    #F2EFE8;
+  --surface:   #FFFFFF;
+  --surface-2: #F8F6F1;
+  --ink-1:     #1B1814;
+  --ink-2:     #63594F;
+  --ink-3:     #9A8E83;
+  --accent:    #B8741A;
+  --accent-bg: #F4E3C4;
+  --chart-1:   #B8741A;
+  --chart-2:   #4E8A70;
+  --up:        #006300;
+  --down:      #C53030;
+  --warn:      #8A5C00;
+  --grid:      #DDD9D0;
+  --border:    #E3DDD5;
+  --r-sm: 6px;
+  --r-md: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground:    #0F0D0B;
+    --surface:   #1C1915;
+    --surface-2: #141210;
+    --ink-1:     #F2EFE8;
+    --ink-2:     #A89880;
+    --ink-3:     #6E6156;
+    --accent:    #E09840;
+    --accent-bg: #2A1E08;
+    --chart-1:   #E09840;
+    --chart-2:   #7EC4A4;
+    --up:        #3DB85F;
+    --down:      #E06060;
+    --warn:      #E09840;
+    --grid:      #2A251E;
+    --border:    #302820;
+  }
+}
+:root[data-theme="light"] {
+  --ground:#F2EFE8;--surface:#FFFFFF;--surface-2:#F8F6F1;
+  --ink-1:#1B1814;--ink-2:#63594F;--ink-3:#9A8E83;
+  --accent:#B8741A;--accent-bg:#F4E3C4;--chart-1:#B8741A;--chart-2:#4E8A70;
+  --up:#006300;--down:#C53030;--warn:#8A5C00;--grid:#DDD9D0;--border:#E3DDD5;
+}
+:root[data-theme="dark"] {
+  --ground:#0F0D0B;--surface:#1C1915;--surface-2:#141210;
+  --ink-1:#F2EFE8;--ink-2:#A89880;--ink-3:#6E6156;
+  --accent:#E09840;--accent-bg:#2A1E08;--chart-1:#E09840;--chart-2:#7EC4A4;
+  --up:#3DB85F;--down:#E06060;--warn:#E09840;--grid:#2A251E;--border:#302820;
+}
+
+/* ── Reset ────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:var(--ground);
+  color:var(--ink-1);
+  font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  font-size:14px;
+  line-height:1.5;
+  padding:24px 16px 48px;
+  -webkit-font-smoothing:antialiased;
+}
+.report{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:12px;}
+
+/* ── Shared card ──────────────────────────────────────── */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r-md);
+  padding:20px 22px;
+}
+.section-label{
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--ink-3);margin-bottom:14px;
+  display:block;
+}
+
+/* ── Header ───────────────────────────────────────────── */
+.report-header{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  gap:16px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:20px 22px;
+}
+.hd-eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--accent);margin-bottom:6px;}
+.hd-account{font-size:22px;font-weight:800;letter-spacing:-.4px;line-height:1;}
+.hd-sub{font-size:12px;color:var(--ink-2);margin-top:3px;}
+.hd-right{text-align:right;flex-shrink:0;}
+.period-badge{
+  display:inline-block;background:var(--accent-bg);color:var(--accent);
+  font-size:11px;font-weight:700;letter-spacing:.03em;
+  padding:5px 12px;border-radius:20px;
+}
+.followers-note{font-size:12px;color:var(--ink-3);margin-top:7px;}
+.followers-note strong{color:var(--ink-1);font-variant-numeric:tabular-nums;}
+
+/* ── KPI grid ─────────────────────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.kpi-tile{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:16px 18px;
+  transition:box-shadow .15s ease;
+}
+@media(prefers-reduced-motion:reduce){.kpi-tile{transition:none;}}
+.kpi-tile:hover{box-shadow:0 2px 12px rgba(0,0,0,.07);}
+.kpi-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.1em;color:var(--ink-3);margin-bottom:8px;display:block;}
+.kpi-val{
+  font-size:36px;font-weight:800;letter-spacing:-1.2px;line-height:1;
+  font-variant-numeric:tabular-nums;color:var(--ink-1);margin-bottom:7px;
+}
+.kpi-delta{font-size:11px;color:var(--ink-3);}
+.up{color:var(--up);font-weight:600;}
+.dn{color:var(--down);font-weight:600;}
+.kpi-tile.alert{border-color:var(--down);}
+.kpi-tile.alert .kpi-val{color:var(--down);}
+
+/* ── Daily charts ─────────────────────────────────────── */
+.charts-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.chart-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:16px 18px;
+}
+.chart-total{
+  font-size:24px;font-weight:700;letter-spacing:-.5px;
+  font-variant-numeric:tabular-nums;color:var(--ink-1);margin-bottom:12px;
+}
+.chart-wrap{height:106px;width:100%;position:relative;}
+.chart-wrap svg{display:block;}
+
+/* ── Engagement breakdown ─────────────────────────────── */
+.eng-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;}
+.eng-item{background:var(--surface-2);border-radius:var(--r-sm);padding:12px;text-align:center;}
+.eng-n{
+  font-size:28px;font-weight:800;letter-spacing:-.5px;line-height:1;
+  font-variant-numeric:tabular-nums;color:var(--ink-1);
+}
+.eng-n.zero{color:var(--down);}
+.eng-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--ink-3);margin-top:4px;font-weight:600;}
+
+/* ── Funnel ───────────────────────────────────────────── */
+.funnel{display:flex;flex-direction:column;gap:3px;margin-top:14px;}
+.funnel-row{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 14px;background:var(--surface-2);border-radius:6px;
+  position:relative;
+}
+.funnel-row+.funnel-row{margin-top:2px;}
+.funnel-connector{
+  text-align:center;font-size:10px;color:var(--ink-3);
+  line-height:1;padding:0 14px;
+}
+.fr-icon{font-size:13px;min-width:18px;}
+.fr-name{flex:1;font-size:13px;color:var(--ink-2);font-weight:500;}
+.fr-val{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink-1);}
+.fr-val.na{font-size:11px;font-weight:400;color:var(--ink-3);font-style:italic;}
+.funnel-note{
+  font-size:11px;color:var(--warn);line-height:1.6;
+  margin-top:12px;padding:10px 12px;
+  background:var(--accent-bg);border-radius:6px;
+  border-left:3px solid var(--accent);
+}
+
+/* ── Top post ─────────────────────────────────────────── */
+.post-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;
+  margin-top:14px;align-items:start;}
+.reel-tag{
+  display:inline-block;background:var(--accent-bg);color:var(--accent);
+  font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  padding:3px 8px;border-radius:4px;margin-bottom:8px;
+}
+.post-caption{
+  font-size:13px;color:var(--ink-2);line-height:1.55;
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;
+}
+.post-watch{margin-top:10px;font-size:12px;color:var(--ink-3);}
+.post-watch strong{color:var(--ink-1);}
+.post-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ps{background:var(--surface-2);border-radius:var(--r-sm);padding:10px 12px;}
+.ps-n{font-size:22px;font-weight:700;letter-spacing:-.3px;
+  font-variant-numeric:tabular-nums;color:var(--ink-1);}
+.ps-k{font-size:9px;text-transform:uppercase;letter-spacing:.1em;
+  color:var(--ink-3);font-weight:600;margin-top:2px;}
+
+/* ── Priorities ───────────────────────────────────────── */
+.priority-list{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+.pi{
+  display:flex;gap:12px;align-items:flex-start;
+  padding:12px 14px;background:var(--surface-2);
+  border-radius:var(--r-sm);border-left:3px solid transparent;
+}
+.pi.crit{border-left-color:var(--down);}
+.pi.warn{border-left-color:var(--accent);}
+.pi.ok{border-left-color:var(--up);}
+.pi-dot{
+  width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:5px;
+  background:var(--down);
+}
+.pi.warn .pi-dot{background:var(--accent);}
+.pi.ok  .pi-dot{background:var(--up);}
+.pi-body strong{display:block;font-size:13px;font-weight:600;
+  color:var(--ink-1);margin-bottom:3px;}
+.pi-body span{font-size:12px;color:var(--ink-2);line-height:1.5;}
+
+/* ── Tooltip ──────────────────────────────────────────── */
+#tip{
+  position:fixed;pointer-events:none;display:none;z-index:9999;
+  background:var(--ink-1);color:var(--surface);
+  font-size:12px;font-weight:600;padding:5px 10px;
+  border-radius:6px;white-space:nowrap;
+  font-family:system-ui,-apple-system,sans-serif;
+}
+
+/* ── Footer ───────────────────────────────────────────── */
+.report-footer{
+  text-align:center;font-size:11px;color:var(--ink-3);
+  padding-top:8px;letter-spacing:.02em;
+}
+
+/* ── Responsive ───────────────────────────────────────── */
+@media(max-width:540px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .charts-pair{grid-template-columns:1fr;}
+  .eng-grid{grid-template-columns:repeat(2,1fr);}
+  .post-grid{grid-template-columns:1fr;}
+  body{padding:14px 12px 36px;}
+  .kpi-val{font-size:28px;}
+  .hd-account{font-size:18px;}
+}
+</style>
+
+<div id="tip"></div>
+
+<div class="report">
+
+  <!-- ── Header ── -->
+  <header class="report-header">
+    <div>
+      <div class="hd-eyebrow">Instagram Weekly Report</div>
+      <div class="hd-account">@makecoffeewithlove</div>
+      <div class="hd-sub">Jimmy · Barista Training Cairns</div>
+    </div>
+    <div class="hd-right">
+      <div class="period-badge">Jul 2 – 8, 2026</div>
+      <div class="followers-note"><strong>1,678</strong> followers total</div>
+    </div>
+  </header>
+
+  <!-- ── KPI Grid ── -->
+  <div class="kpi-grid">
+    <div class="kpi-tile">
+      <span class="kpi-lbl">Accounts Reached</span>
+      <div class="kpi-val">700</div>
+      <div class="kpi-delta"><span class="dn">▼ 1.4%</span> vs last wk (710)</div>
+    </div>
+    <div class="kpi-tile">
+      <span class="kpi-lbl">Content Views</span>
+      <div class="kpi-val">1,295</div>
+      <div class="kpi-delta"><span class="dn">▼ 15.9%</span> vs last wk (1,540)</div>
+    </div>
+    <div class="kpi-tile">
+      <span class="kpi-lbl">New Followers</span>
+      <div class="kpi-val">+7</div>
+      <div class="kpi-delta"><span class="up">▲ +16.7%</span> vs last wk (+6)</div>
+    </div>
+    <div class="kpi-tile">
+      <span class="kpi-lbl">Engagement Rate</span>
+      <div class="kpi-val">3.1%</div>
+      <div class="kpi-delta"><span class="dn">▼</span> from 5.8% last week</div>
+    </div>
+    <div class="kpi-tile">
+      <span class="kpi-lbl">Total Engagements</span>
+      <div class="kpi-val">22</div>
+      <div class="kpi-delta"><span class="dn">▼ 46.3%</span> vs last wk (41)</div>
+    </div>
+    <div class="kpi-tile alert">
+      <span class="kpi-lbl">⚠ Save Rate</span>
+      <div class="kpi-val">0%</div>
+      <div class="kpi-delta"><span class="dn">0 saves</span> — was 2 last week</div>
+    </div>
+  </div>
+
+  <!-- ── Daily Charts ── -->
+  <div class="charts-pair">
+    <div class="chart-card">
+      <span class="kpi-lbl">Daily Reach</span>
+      <div class="chart-total">700 accounts</div>
+      <div class="chart-wrap" id="chart-reach"></div>
+    </div>
+    <div class="chart-card">
+      <span class="kpi-lbl">Daily Views</span>
+      <div class="chart-total">1,295 views</div>
+      <div class="chart-wrap" id="chart-views"></div>
+    </div>
+  </div>
+
+  <!-- ── Engagement Breakdown ── -->
+  <div class="card">
+    <span class="section-label">Engagement Breakdown · Jul 2–8</span>
+    <div class="eng-grid">
+      <div class="eng-item">
+        <div class="eng-n">22</div>
+        <div class="eng-lbl">Likes</div>
+      </div>
+      <div class="eng-item">
+        <div class="eng-n zero">0</div>
+        <div class="eng-lbl">Comments</div>
+      </div>
+      <div class="eng-item">
+        <div class="eng-n zero">0</div>
+        <div class="eng-lbl">Saves</div>
+      </div>
+      <div class="eng-item">
+        <div class="eng-n zero">0</div>
+        <div class="eng-lbl">Shares</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Booking Funnel ── -->
+  <div class="card">
+    <span class="section-label">Booking Funnel · Jul 2–8</span>
+    <div class="funnel">
+      <div class="funnel-row">
+        <span class="fr-icon">📡</span>
+        <span class="fr-name">Accounts Reached</span>
+        <span class="fr-val">700</span>
+      </div>
+      <div class="funnel-connector">↓</div>
+      <div class="funnel-row">
+        <span class="fr-icon">👤</span>
+        <span class="fr-name">Profile Visits</span>
+        <span class="fr-val na">Check Instagram app</span>
+      </div>
+      <div class="funnel-connector">↓</div>
+      <div class="funnel-row">
+        <span class="fr-icon">🔗</span>
+        <span class="fr-name">Bio Link Clicks</span>
+        <span class="fr-val na">Check Instagram app</span>
+      </div>
+      <div class="funnel-connector">↓</div>
+      <div class="funnel-row">
+        <span class="fr-icon">📅</span>
+        <span class="fr-name">Calendly Bookings</span>
+        <span class="fr-val na">Add from Calendly</span>
+      </div>
+      <div class="funnel-connector">↓</div>
+      <div class="funnel-row">
+        <span class="fr-icon">💳</span>
+        <span class="fr-name">Deposits Paid (Stripe)</span>
+        <span class="fr-val na">Add from Stripe</span>
+      </div>
+    </div>
+    <div class="funnel-note">
+      Profile visits and bio link clicks are no longer available via Instagram's API. Find them manually: Instagram app → Professional Dashboard → Profile Activity → "Profile visits" and "Website taps".
+    </div>
+  </div>
+
+  <!-- ── Top Post ── -->
+  <div class="card">
+    <span class="section-label">Top Post This Week</span>
+    <div class="post-grid">
+      <div>
+        <div class="reel-tag">Reel · Jul 7, 2026</div>
+        <div class="post-caption">"Every great barista starts somewhere. Kentaro had never poured rosette latte art before — started with a perfect love heart and finished with a strong rosette in one class. We focused on the fundamentals: milk texture, pouring technique, repetition, feedback. That's how confidence is built."</div>
+        <div class="post-watch">Avg watch time: <strong>5.4 seconds</strong></div>
+      </div>
+      <div class="post-stats">
+        <div class="ps"><div class="ps-n">483</div><div class="ps-k">Reach</div></div>
+        <div class="ps"><div class="ps-n">678</div><div class="ps-k">Views</div></div>
+        <div class="ps"><div class="ps-n">15</div><div class="ps-k">Interactions</div></div>
+        <div class="ps"><div class="ps-n">3.1%</div><div class="ps-k">Eng. Rate</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Priorities ── -->
+  <div class="card">
+    <span class="section-label">This Week's Priorities</span>
+    <div class="priority-list">
+      <div class="pi crit">
+        <div class="pi-dot"></div>
+        <div class="pi-body">
+          <strong>Zero saves — create content worth bookmarking</strong>
+          <span>Saves drive the algorithm more than likes. Try: "3 mistakes beginners make with milk texture" or a step-by-step troubleshooting guide. People save how-to content, not just inspiration.</span>
+        </div>
+      </div>
+      <div class="pi crit">
+        <div class="pi-dot"></div>
+        <div class="pi-body">
+          <strong>Zero comments — end every caption with a direct question</strong>
+          <span>"What's your biggest struggle with latte art right now?" or "Coffee or matcha — which do you prefer to learn first?" A question opens a conversation; a statement closes it.</span>
+        </div>
+      </div>
+      <div class="pi crit">
+        <div class="pi-dot"></div>
+        <div class="pi-body">
+          <strong>Only 1 post published — target is 4–5 per week</strong>
+          <span>On Jul 7 (posting day), reach jumped from 9 to 336. That's what a single post does. More posts = more spikes. Plan: Mon / Wed / Fri feed post + 1 Story daily minimum.</span>
+        </div>
+      </div>
+      <div class="pi warn">
+        <div class="pi-dot"></div>
+        <div class="pi-body">
+          <strong>Profile visits and link clicks not in this report</strong>
+          <span>Instagram's API no longer provides these. Check manually each Monday: Professional Dashboard → Profile Activity → "Profile visits" and "Website taps". These are your most direct booking signals.</span>
+        </div>
+      </div>
+      <div class="pi ok">
+        <div class="pi-dot"></div>
+        <div class="pi-body">
+          <strong>Follower growth above target — +7 this week vs +6 last week</strong>
+          <span>The before/after transformation Reel is converting viewers to followers. Kentaro's story worked because it was specific and personal. Make more like it — one per week minimum.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="report-footer">
+    Generated Jul 9, 2026 &nbsp;·&nbsp; @makecoffeewithlove &nbsp;·&nbsp; Next report: Jul 16, 2026
+  </footer>
+
+</div>
+
+<script>
+const tip = document.getElementById('tip');
+
+document.addEventListener('mousemove', e => {
+  if (tip.style.display === 'block') {
+    tip.style.left = (e.clientX + 14) + 'px';
+    tip.style.top  = (e.clientY - 40) + 'px';
+  }
+});
+
+function buildChart(id, rows, cssColor) {
+  const wrap = document.getElementById(id);
+  if (!wrap) return;
+
+  const W = Math.max(wrap.offsetWidth, 180);
+  const H = 106;
+  const PT = 10, PB = 20, PL = 0, PR = 0;
+  const cW = W - PL - PR;
+  const cH = H - PT - PB;
+  const n  = rows.length;
+  const max = Math.max(...rows.map(r => r.v), 1);
+  const band = cW / n;
+  const bw   = Math.max(band * 0.5, 5);
+  const ns   = 'http://www.w3.org/2000/svg';
+
+  wrap.innerHTML = '';
+  const svg = document.createElementNS(ns, 'svg');
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+  svg.setAttribute('role', 'img');
+  svg.setAttribute('aria-label', id + ' bar chart');
+
+  // Baseline
+  const bl = document.createElementNS(ns, 'line');
+  bl.setAttribute('x1', PL); bl.setAttribute('x2', PL + cW);
+  bl.setAttribute('y1', PT + cH); bl.setAttribute('y2', PT + cH);
+  bl.setAttribute('stroke', 'var(--grid)'); bl.setAttribute('stroke-width', '1');
+  svg.appendChild(bl);
+
+  // Mid gridline (dashed)
+  const ml = document.createElementNS(ns, 'line');
+  ml.setAttribute('x1', PL); ml.setAttribute('x2', PL + cW);
+  ml.setAttribute('y1', PT + cH / 2); ml.setAttribute('y2', PT + cH / 2);
+  ml.setAttribute('stroke', 'var(--grid)');
+  ml.setAttribute('stroke-width', '0.5');
+  ml.setAttribute('stroke-dasharray', '3 3');
+  svg.appendChild(ml);
+
+  rows.forEach((r, i) => {
+    const cx = PL + (i + 0.5) * band;
+    const bh = (r.v / max) * cH;
+    const by = PT + cH - bh;
+    const bx = cx - bw / 2;
+
+    const rect = document.createElementNS(ns, 'rect');
+    rect.setAttribute('x', bx);
+    rect.setAttribute('y', r.v > 0 ? by : PT + cH);
+    rect.setAttribute('width', bw);
+    rect.setAttribute('height', Math.max(bh, 0));
+    rect.setAttribute('rx', '3');
+    rect.setAttribute('fill', 'var(' + cssColor + ')');
+    svg.appendChild(rect);
+
+    // Peak label
+    if (r.v === max) {
+      const pk = document.createElementNS(ns, 'text');
+      pk.setAttribute('x', cx);
+      pk.setAttribute('y', by - 3);
+      pk.setAttribute('text-anchor', 'middle');
+      pk.setAttribute('font-size', '9');
+      pk.setAttribute('font-weight', '700');
+      pk.setAttribute('font-family', 'system-ui,-apple-system,sans-serif');
+      pk.setAttribute('fill', 'var(' + cssColor + ')');
+      pk.textContent = r.v.toLocaleString();
+      svg.appendChild(pk);
+    }
+
+    // Day label
+    const lbl = document.createElementNS(ns, 'text');
+    lbl.setAttribute('x', cx);
+    lbl.setAttribute('y', H - 4);
+    lbl.setAttribute('text-anchor', 'middle');
+    lbl.setAttribute('font-size', '8.5');
+    lbl.setAttribute('font-family', 'system-ui,-apple-system,sans-serif');
+    lbl.setAttribute('fill', 'var(--ink-3)');
+    lbl.textContent = r.d;
+    svg.appendChild(lbl);
+
+    // Hit target (invisible, wider than bar for easy hover)
+    const hit = document.createElementNS(ns, 'rect');
+    hit.setAttribute('x', PL + i * band);
+    hit.setAttribute('y', PT);
+    hit.setAttribute('width', band);
+    hit.setAttribute('height', cH);
+    hit.setAttribute('fill', 'transparent');
+    hit.style.cursor = 'crosshair';
+    hit.addEventListener('mouseenter', e => {
+      rect.setAttribute('opacity', '0.70');
+      tip.textContent = r.label + ': ' + r.v.toLocaleString();
+      tip.style.display = 'block';
+      tip.style.left = (e.clientX + 14) + 'px';
+      tip.style.top  = (e.clientY - 40) + 'px';
+    });
+    hit.addEventListener('mouseleave', () => {
+      rect.setAttribute('opacity', '1');
+      tip.style.display = 'none';
+    });
+    svg.appendChild(hit);
+  });
+
+  wrap.appendChild(svg);
+}
+
+const reachData = [
+  {label:'Jul 2',d:'2',v:11},{label:'Jul 3',d:'3',v:15},
+  {label:'Jul 4',d:'4',v:18},{label:'Jul 5',d:'5',v:9},
+  {label:'Jul 6',d:'6',v:9},{label:'Jul 7',d:'7',v:336},
+  {label:'Jul 8',d:'8',v:302}
+];
+const viewsData = [
+  {label:'Jul 2',d:'2',v:23},{label:'Jul 3',d:'3',v:59},
+  {label:'Jul 4',d:'4',v:61},{label:'Jul 5',d:'5',v:32},
+  {label:'Jul 6',d:'6',v:136},{label:'Jul 7',d:'7',v:550},
+  {label:'Jul 8',d:'8',v:434}
+];
+
+function init() {
+  buildChart('chart-reach', reachData, '--chart-1');
+  buildChart('chart-views', viewsData, '--chart-2');
+}
+
+window.addEventListener('DOMContentLoaded', () => requestAnimationFrame(init));
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(init, 120);
+});
+</script>
