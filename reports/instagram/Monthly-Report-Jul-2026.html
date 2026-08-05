@@ -134,6 +134,14 @@ body{background:var(--ground);color:var(--ink-1);font-family:system-ui,-apple-sy
 .pi-body strong{display:block;font-size:13px;font-weight:600;color:var(--ink-1);margin-bottom:3px;}
 .pi-body span{font-size:12px;color:var(--ink-2);line-height:1.5;}
 
+/* Momentum banner */
+.momentum-banner{background:var(--accent-bg);border:1.5px solid var(--accent);border-radius:var(--r-md);padding:18px 22px;display:flex;align-items:center;gap:18px;}
+.mom-big{font-size:42px;font-weight:800;letter-spacing:-1.5px;color:var(--accent);line-height:1;flex-shrink:0;}
+.mom-body{}
+.mom-title{font-size:14px;font-weight:700;color:var(--ink-1);margin-bottom:4px;}
+.mom-detail{font-size:12px;color:var(--ink-2);line-height:1.6;}
+.mom-proof{display:inline-block;margin-top:7px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);background:color-mix(in srgb,var(--accent-bg) 60%,var(--accent) 10%);padding:3px 9px;border-radius:10px;}
+
 /* Footer */
 .report-footer{text-align:center;font-size:11px;color:var(--ink-3);padding-top:8px;letter-spacing:.02em;}
 
@@ -158,10 +166,20 @@ body{background:var(--ground);color:var(--ink-1);font-family:system-ui,-apple-sy
       <div class="hd-sub">Jimmy · Barista Training Cairns</div>
     </div>
     <div class="hd-right">
-      <div class="period-badge">Last 30 Days</div>
-      <div class="source-note">Source: Instagram app screenshots</div>
+      <div class="period-badge">Jul 6 – Aug 4, 2026</div>
+      <div class="source-note">Source: Instagram Insights screenshots</div>
     </div>
   </header>
+
+  <!-- Momentum Banner -->
+  <div class="momentum-banner">
+    <div class="mom-big">+93%</div>
+    <div class="mom-body">
+      <div class="mom-title">Views up 93% compared to last month</div>
+      <div class="mom-detail">Previous 30 days: ~6,700 views &nbsp;→&nbsp; This period: <strong>12,984 views</strong>. Instagram's own analysis attributes this directly to posting 2 more Reels than the previous month. More Reels = more reach. The math is that simple.</div>
+      <div class="mom-proof">Instagram confirmed: 2 extra Reels drove the 93% lift</div>
+    </div>
+  </div>
 
   <!-- KPI Grid -->
   <div class="kpi-grid">
@@ -173,7 +191,7 @@ body{background:var(--ground);color:var(--ink-1);font-family:system-ui,-apple-sy
     <div class="kpi-tile">
       <span class="kpi-lbl">Total Views</span>
       <div class="kpi-val">12.9K</div>
-      <div class="kpi-sub">Reels + Stories + Posts</div>
+      <div class="kpi-sub"><span class="up">+93%</span> vs last month</div>
     </div>
     <div class="kpi-tile">
       <span class="kpi-lbl">Total Interactions</span>
@@ -354,6 +372,14 @@ body{background:var(--ground);color:var(--ink-1);font-family:system-ui,-apple-sy
   <div class="card">
     <span class="sec-lbl">Top Priorities for Next 30 Days</span>
     <div class="priority-list">
+
+      <div class="pi ok">
+        <div class="pi-dot"></div>
+        <div class="pi-body">
+          <strong>Keep posting Reels — Instagram proved 2 more Reels = +93% views</strong>
+          <span>This month you posted 2 more Reels than the previous month. Instagram's own analysis confirmed that alone drove 93% more views. You went from ~6,700 views to 12,984. The next step is consistency: aim for 3–4 Reels per week, every week, not burst weeks followed by silence. The Jul 20 spike in your chart shows what happens when you post — and the August drop shows what happens when you stop.</span>
+        </div>
+      </div>
 
       <div class="pi crit">
         <div class="pi-dot"></div>
