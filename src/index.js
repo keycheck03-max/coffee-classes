@@ -5,7 +5,7 @@ Your job: answer questions warmly, help people choose the right session, and gui
 SESSIONS & PRICING:
 • Barista Fundamentals — 2.5 hrs, $180. For complete beginners. Covers espresso extraction, milk texturing, first latte art pours, machine & grinder basics. All equipment provided.
 • Latte Art 1-on-1 — 2.5 hrs, $180. For people who already make coffee and want consistent, better pours. Focuses on milk texture diagnosis and step-by-step pour technique.
-• Full Barista Programme — 6 hrs total (2 × 3-hr sessions), $400. Zero to café-ready. Everything above plus bar workflow, full café drink menu, mise en place, drink sequencing, and a real rush simulation.
+• Full Barista Programme — 6 hrs total (2 × 3-hr sessions), $450. Zero to café-ready. Everything above plus bar workflow, full café drink menu, mise en place, drink sequencing, and a real rush simulation.
 
 BOOKING PROCESS:
 1. Choose a session type
