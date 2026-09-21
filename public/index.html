@@ -176,30 +176,33 @@
     .learn { background: var(--cream); }
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 20px;
-      margin-top: 48px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px 32px;
+      margin-top: 36px;
     }
     .card {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 4px 0;
+    }
+    .card-icon {
+      font-size: 1.3rem;
+      line-height: 1;
+      width: 34px; height: 34px;
+      flex-shrink: 0;
       background: var(--milk);
-      border: 1px solid rgba(200,169,122,0.2);
-      border-radius: 18px;
-      padding: 28px 24px;
-      transition: transform 0.2s, box-shadow 0.2s;
+      border: 1px solid rgba(200,169,122,0.25);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
     }
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 36px rgba(92,51,23,0.08);
-    }
-    .card-icon { font-size: 2rem; margin-bottom: 14px; }
     .card h3 {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.05rem;
+      font-size: 0.95rem;
       color: var(--espresso);
-      margin-bottom: 8px;
+      margin-bottom: 2px;
       font-weight: 600;
     }
-    .card p { font-size: 0.88rem; color: var(--ash); line-height: 1.6; }
+    .card p { font-size: 0.85rem; color: var(--ash); line-height: 1.5; margin: 0; }
 
     /* ── HOW IT WORKS ── */
     .steps { margin-top: 56px; }
@@ -644,28 +647,38 @@
     <div class="cards stagger">
       <div class="card">
         <div class="card-icon">☕</div>
-        <h3>Master Espresso Extraction</h3>
-        <p>Learn to pull a perfect espresso shot every time. We cover the full process — grind, dose, timing, and how to read your shot so you always know what to adjust.</p>
+        <div>
+          <h3>Master Espresso Extraction</h3>
+          <p>Grind, dose, timing, and reading your shot.</p>
+        </div>
       </div>
       <div class="card">
         <div class="card-icon">🥛</div>
-        <h3>Milk Texturing</h3>
-        <p>Get silky, consistent microfoam every time. The foundation of every great coffee drink.</p>
+        <div>
+          <h3>Milk Texturing</h3>
+          <p>Silky, consistent microfoam every time.</p>
+        </div>
       </div>
       <div class="card">
         <div class="card-icon">🎨</div>
-        <h3>Latte Art Practice</h3>
-        <p>Most classes teach knowledge. This class gives results. My feedback-driven method helps you improve with every single pour — not just random practice with no direction.</p>
+        <div>
+          <h3>Latte Art Practice</h3>
+          <p>Feedback-driven pours that actually improve.</p>
+        </div>
       </div>
       <div class="card">
         <div class="card-icon">🔧</div>
-        <h3>Equipment & Tools</h3>
-        <p>Get hands-on with everything behind the bar — the espresso machine, grinder, tamper, and accessories. You'll know exactly what each tool does and how to operate it confidently.</p>
+        <div>
+          <h3>Equipment &amp; Tools</h3>
+          <p>Machine, grinder, tamper, and accessories.</p>
+        </div>
       </div>
       <div class="card">
         <div class="card-icon">📋</div>
-        <h3>Workflow Management</h3>
-        <p>Learn how to set up your workspace for success and manage the bar when it's busy. Build the habits and systems that keep you calm, efficient, and in control during service.</p>
+        <div>
+          <h3>Workflow Management</h3>
+          <p>Set up, manage the bar, stay in control.</p>
+        </div>
       </div>
     </div>
   </div>
